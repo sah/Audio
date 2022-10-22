@@ -54,7 +54,6 @@ DMAChannel AudioOutputI2S::dma(false);
 void AudioOutputI2S::begin(void)
 {
 #if defined(__SAMD51__)
-	i2s = new Adafruit_ZeroI2S;
 	dma = new Adafruit_ZeroDMA;
 
 	stat = dma->allocate();
@@ -409,13 +408,15 @@ void AudioOutputI2S::config_i2s(void)
 {
 #if defined(__SAMD51__)
 
-//check that i2s has not already been configured
-	//if(!I2S->CTRLA.bit.ENABLE)
+        //check that i2s has not already been configured
+	if (!i2s) {
+		i2s = new Adafruit_ZeroI2S;
 		i2s->begin(I2S_16_BIT, 44100);
 
-	i2s->enableMCLK();
-	i2s->enableTx();
-	i2s->enableRx();
+		i2s->enableMCLK();
+		i2s->enableTx();
+		i2s->enableRx();
+	}
 #else
 	SIM_SCGC6 |= SIM_SCGC6_I2S;
 	SIM_SCGC7 |= SIM_SCGC7_DMA;
@@ -544,4 +545,3 @@ void AudioOutputI2Sslave::config_i2s(void)
 }
 
 #endif
-
